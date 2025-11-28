@@ -1,6 +1,6 @@
 # Dependencies
 node_modules/
-.github/copilot-instructions.md
+.github/
 # Environment files
 .env
 .env.local

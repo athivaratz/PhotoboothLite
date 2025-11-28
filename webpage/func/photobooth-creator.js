@@ -121,7 +121,7 @@ class PhotoBoothCreator {
                             ${this.app.slotAssignments[index]
                                 ? `<img src="/api/photos/${encodeURIComponent(this.app.slotAssignments[index])}/thumbnail" alt="${this.app.slotAssignments[index]}">
                                      <button class="clear-slot" onclick="photoApp.photoBoothCreator.clearSlot(${index}); event.stopPropagation();">×</button>`
-                                : 'ลากรูปมาวางที่นี่'}
+                                : 'คลิ๊กช่องและรูปเพื่อวางที่นี่'}
                         </div>
                     </div>
                 `).join('')}

@@ -1,6 +1,6 @@
 # 📸 PhotoBooth Lite
 
-ระบบถ่ายรูป PhotoBooth สำหรับงานอีเวนต์ - ใช้งานง่าย ติดตั้งเร็ว
+Sod PhotoBooth สำหรับงานอีเวนต์ - ใช้งานง่าย ติดตั้งเร็ว
 
 ---
 
@@ -13,6 +13,21 @@
 - 📦 ดาวน์โหลดรูปทั้งหมดเป็นไฟล์ ZIP
 
 ---
+## 🖼 Template กรอบ
+
+- มีกรอบตัวอย่างให้เลือกใช้ในโฟลเดอร์ `frames/` หรือจะสร้างกรอบเองก็ได้!
+
+## 📁 โครงสร้างโฟลเดอร์
+
+```
+ptb-lite/
+├── frames/          ← ไฟล์กรอบรูป
+├── processed_photos/ ← รูปที่ประมวลผลแล้ว
+├── exports/         ← รูปที่ส่งออก
+│   ├── FrameWithPics/ ← รูป Photobooth
+│   └── Pics/        ← รูปต้นฉบับ
+└── webpage/         ← ไฟล์โปรแกรม
+```
 
 ## 🚀 วิธีติดตั้ง
 
@@ -96,24 +111,9 @@ http://localhost:5000
 
 ---
 
-## 📁 โครงสร้างโฟลเดอร์
 
-```
-ptb-lite/
-├── frames/          ← ไฟล์กรอบรูป
-├── processed_photos/ ← รูปที่ประมวลผลแล้ว
-├── exports/         ← รูปที่ส่งออก
-│   ├── FrameWithPics/ ← รูป Photobooth
-│   └── Pics/        ← รูปต้นฉบับ
-└── webpage/         ← ไฟล์โปรแกรม
-```
 
 ---
 
-## 📄 License
 
-MIT License - ใช้งานและแก้ไขได้อิสระ
-
----
-
-Made with ❤️ for event photographers
+Made with ❤️ By SOD BD2
