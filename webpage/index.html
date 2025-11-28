@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhotoBooth Gallery - Lite Version</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>📸</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.js" onerror="this.onerror=null;this.src='/socket.io/socket.io.js'"></script>
+    <script>
+        // Debug console logging
+        console.log('🚀 PhotoBooth UI Loading...');
+        
+        // Check if required libraries are loaded
+        window.addEventListener('load', function() {
+            console.log('📄 Page loaded');
+            console.log('🔌 Socket.IO loaded:', typeof io !== 'undefined');
+            
+            // Basic error handling
+            window.onerror = function(msg, url, line, col, error) {
+                console.error('❌ JavaScript Error:', {
+                    message: msg,
+                    source: url,
+                    line: line,
+                    column: col,
+                    error: error
+                });
+                return false;
+            };
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📸 PhotoBooth Gallery - Lite</h1>
+            <div class="status-bar">
+                <div class="status-item">
+                    <div class="status-dot" id="status-dot"></div>
+                    <span id="status-text">กำลังตรวจสอบ...</span>
+                </div>
+                <div class="status-item">
+                    <span>📁 <span id="current-path">-</span></span>
+                </div>
+                <div class="status-item">
+                    <span>📷 <span id="photo-count">0</span> รูป</span>
+                </div>
+                <div class="controls">
+                    <button class="btn" id="btn-scan">🔄 สแกนใหม่</button>
+                    <button class="btn" id="btn-toggle-watch">⏯️ เปิด/ปิดการดู</button>
+                    <button class="btn success" id="btn-export">📦 ดาวน์โหลด ZIP</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="gallery">🖼️ แกลเลอรี่</button>
+            <button class="tab" data-tab="creator">🎨 สร้างโฟโต้บูท</button>
+            <button class="tab" data-tab="frames">🖼️ จัดการเฟรม</button>
+            <button class="tab" data-tab="admin">⚙️ จัดการ</button>
+        </div>
+
+        <div class="tab-content">
+            <!-- Gallery Tab -->
+            <div class="tab-panel active" id="gallery-panel">
+                <div id="gallery-container" class="gallery">
+                    <div class="loading">กำลังโหลดรูปภาพ...</div>
+                </div>
+                <div id="gallery-pagination" class="gallery-pagination"></div>
+            </div>
+
+            <!-- PhotoBooth Creator Tab -->
+            <div class="tab-panel" id="creator-panel">
+                <div class="admin-section">
+                    <h3>🎨 PhotoBooth Creator</h3>
+                    <div class="creator-info">
+                        <p>เลือกรูปจากแกลเลอรี่เพื่อนำมาใส่เฟรมโฟโต้บูท</p>
+                    </div>
+
+                    <div class="creator-controls">
+                        <div class="frame-selection">
+                            <label>🖼️ เลือกเฟรม:</label>
+                            <select id="creator-frame-select" class="form-control">
+                                <option value="">-- เลือกเฟรม --</option>
+                            </select>
+                        </div>
+                        
+                        <div class="creator-actions">
+                            <button class="btn success" id="btn-load-creator">🎯 โหลดเฟรม</button>
+                            <button class="btn" id="btn-auto-fill">🔄 ใส่รูปอัตโนมัติ</button>
+                            <button class="btn" id="btn-clear-slots">🗑️ ล้าง Slots</button>
+                            <button class="btn success" id="btn-generate-photobooth">🎨 สร้างโฟโต้บูท</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="creator-workspace">
+                    <div class="slots-assignment" id="slots-assignment">
+                        <h4>🎯 จัดเรียงรูปใน Slots:</h4>
+                        <div class="assignment-placeholder">
+                            <p>เลือกเฟรมเพื่อเริ่มการจัดเรียงรูป</p>
+                        </div>
+                    </div>
+
+                    <div class="photo-selector" id="photo-selector">
+                        <h4>📷 เลือกรูปจากแกลเลอรี่:</h4>
+                        <div class="selector-photos" id="selector-photos">
+                            <div class="loading">กำลังโหลดรูป...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preview-section">
+                    <h4>👁️ ตัวอย่างผลลัพธ์:</h4>
+                    <div class="photobooth-preview" id="photobooth-preview">
+                        <div class="preview-placeholder">
+                            <div class="preview-icon">🖼️</div>
+                            <p>ตัวอย่างจะแสดงที่นี่เมื่อสร้างโฟโต้บูท</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Frame Management Tab -->
+            <div class="tab-panel" id="frames-panel">
+                <div class="admin-section">
+                    <h3>🖼️ เลือกเฟรม</h3>
+                    <div class="template-options" id="template-options">
+                        <div class="loading">กำลังโหลดเฟรม...</div>
+                    </div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>🎯 แก้ไข Frame Mapping</h3>
+                    <div class="creator-controls">
+                        <div class="frame-selection">
+                            <label>เฟรมที่เลือก:</label>
+                            <span id="selected-frame-name">-</span>
+                        </div>
+                        
+                        <div class="creator-actions">
+                            <button class="btn" id="btn-import-frame">📥 นำเข้าเฟรมใหม่</button>
+                            <button class="btn" id="btn-load-frame-editor">📋 โหลดตัวแก้ไข</button>
+                            <button class="btn success" id="btn-save-frame-mapping">💾 บันทึก Mapping</button>
+                            <button class="btn" id="btn-add-slot">➕ เพิ่ม Slot</button>
+                            <button class="btn danger" id="btn-delete-template">🗑️ ลบ Template</button>
+                            <button class="btn danger" id="btn-reset-mapping">🔄 รีเซ็ต</button>
+                        </div>
+                    </div>
+                    
+                    <div class="frame-editor" id="frame-editor">
+                        <div class="editor-workspace">
+                            <div class="frame-preview" id="frame-preview">
+                                <div class="preview-placeholder">
+                                    <div class="preview-icon">🖼️</div>
+                                    <p>เลือกเฟรมเพื่อแก้ไข mapping</p>
+                                </div>
+                            </div>
+                            
+                            <div class="slots-config" id="slots-config">
+                                <h4>การตั้งค่า Slots:</h4>
+                                <div class="slots-list" id="slots-list">
+                                    <!-- Slots configuration will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Tab -->
+            <div class="tab-panel" id="admin-panel">
+                <div class="admin-section">
+                    <h3>📁 การตั้งค่าโฟลเดอร์</h3>
+                    <div class="form-group">
+                        <label for="watch-path-input">โฟลเดอร์ที่ต้องการดู:</label>
+                        <input type="text" class="form-control" id="watch-path-input" placeholder="C:/Users/...">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn" id="btn-browse-folder">📁 เลือกโฟลเดอร์</button>
+                        <button class="btn" id="btn-today-folder">📅 โฟลเดอร์วันนี้</button>
+                        <button class="btn success" id="btn-save-path">💾 บันทึก</button>
+                    </div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>📋 ประวัติโฟลเดอร์</h3>
+                    <div class="path-history" id="path-history">
+                        <div class="loading">กำลังโหลด...</div>
+                    </div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>🗑️ จัดการรูปภาพ</h3>
+                    <div class="controls">
+                        <button class="btn danger" id="btn-clear-all">🗑️ ลบรูปทั้งหมด</button>
+                        <button class="btn" id="btn-refresh-gallery">🔄 รีเฟรชแกลเลอรี่</button>
+                    </div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>📊 สถิติ</h3>
+                    <div id="admin-stats">
+                        <div class="loading">กำลังโหลด...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification System -->
+    <div class="notification" id="notification"></div>
+
+    <!-- Hidden Canvas Container for PhotoBooth Generation -->
+    <div id="print-canvas-container">
+        <canvas id="print-canvas" style="display: none;"></canvas>
+    </div>
+
+    <!-- Frame Editor Modal - Full Screen -->
+    <div id="frame-editor-modal" class="modal hidden" aria-hidden="true">
+        <div class="modal-backdrop" data-close="true"></div>
+        <div class="modal-dialog modal-fullscreen" role="dialog" aria-modal="true" aria-labelledby="frame-editor-title">
+            <div class="modal-header">
+                <div class="modal-header-left">
+                    <h3 id="frame-editor-title" class="modal-title">🖼️ ตัวแก้ไขเฟรม</h3>
+                    <p class="modal-instructions">🖱️ คลิก Slot เพื่อเลือก → ลากเพื่อย้าย → ลากมุมเพื่อปรับขนาด</p>
+                </div>
+                <div class="modal-header-right">
+                    <button class="btn" id="btn-toggle-draw">✏️ วาด Slot</button>
+                    <button class="btn success" id="btn-done-frame-modal">✅ เสร็จสิ้น</button>
+                    <button class="btn close" id="btn-close-frame-modal" aria-label="ปิด">✖</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="editor-layout">
+                    <div class="editor-canvas">
+                        <div class="frame-preview" id="frame-preview-modal"></div>
+                    </div>
+                    <div class="editor-sidebar">
+                        <div class="sidebar-section">
+                            <h4>📋 รายการ Slots</h4>
+                            <div id="modal-slots-list" class="slots-list-modal"></div>
+                        </div>
+                        <div class="sidebar-section">
+                            <h4>💡 วิธีใช้</h4>
+                            <ul class="help-list">
+                                <li>🎨 <strong>วาด:</strong> กดปุ่ม "วาด Slot" แล้วลากบนรูป</li>
+                                <li>👆 <strong>เลือก:</strong> คลิกที่ Slot</li>
+                                <li>✋ <strong>ย้าย:</strong> ลาก Slot ที่เลือก</li>
+                                <li>↔️ <strong>ปรับขนาด:</strong> ลากจุดมุมหรือขอบ</li>
+                                <li>🗑️ <strong>ลบ:</strong> กด Delete หรือปุ่มลบ</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load functional modules first -->
+    <script src="func/ui-utils.js"></script>
+    <script src="func/socket.js"></script>
+    <script src="func/gallery.js"></script>
+    <script src="func/photobooth-creator.js"></script>
+    <script src="func/photo-actions.js"></script>
+    <script src="func/admin.js"></script>
+    <script src="func/frame-manager.js"></script>
+    
+    <!-- Load main app after modules -->
+    <script src="app.js" onerror="console.error('❌ Failed to load app.js'); document.body.innerHTML+='<div style=&quot;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#f8d7da;color:#721c24;padding:20px;border-radius:8px;text-align:center;z-index:9999;&quot;><h3>⚠️ ไฟล์ JavaScript ไม่โหลด</h3><p>กรุณารีเฟรชหน้าเว็บ (Ctrl+F5)</p></div>';"></script>
+</body>
+</html>

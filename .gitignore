@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+.github/copilot-instructions.md
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Processed photos and exports (user data)
+processed_photos/
+exports/
+
+# Keep folder structure
+!processed_photos/.gitkeep
+!exports/.gitkeep
+!exports/FrameWithPics/.gitkeep
+!exports/Pics/.gitkeep
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Build files
+dist/
+build/

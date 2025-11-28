@@ -1,0 +1,32 @@
+{
+  "name": "ptb-lite",
+  "version": "1.0.0",
+  "description": "PhotoBooth Lite - Event Photo System",
+  "main": "webpage/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node webpage/server.js",
+    "dev": "node webpage/server.js",
+    "doctor": "node -e \"console.log('Node',process.version);console.log('Platform',process.platform);\""
+  },
+  "keywords": ["photobooth", "photo", "event", "express", "nodejs"],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "chokidar": "^4.0.3",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "morgan": "^1.10.0",
+    "multer": "^2.0.2",
+    "sharp": "^0.34.4",
+    "socket.io": "^4.8.1"
+  }
+}
